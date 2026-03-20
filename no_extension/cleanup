@@ -1,0 +1,26 @@
+#!/bin/bash
+
+for file in *; do
+    if [[ -f "$file" ]]; then
+        
+        # Get extension
+        ext="${file##*.}"
+
+        # If no extension
+        if [[ "$file" != *.* ]]; then
+            ext="no_extension"
+        fi
+
+        # Create folder if not exists
+        mkdir -p "$ext"
+
+        # Move file
+        mv "$file" "$ext/"
+
+        echo "Moved $file -> $ext/"
+    fi
+done
+
+echo "Cleanup complete"
+
+ls -R

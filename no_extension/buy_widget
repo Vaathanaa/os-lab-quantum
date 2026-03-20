@@ -1,0 +1,35 @@
+#!/bin/bash
+
+INVENTORY="/home/g11-chhit-sovathana/bin/public_api/inventory.txt"
+LOCKFILE="/home/g11-chhit-sovathana/bin/public_api/inventory.lock"
+SALESLOG="/home/g11-chhit-sovathana/bin/public_api/sales.log"
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage: buy_widget <username> <quantity>"
+    exit 1
+fi
+
+username="$1"
+quantity="$2"
+
+if ! [[ "$quantity" =~ ^[1-9][0-9]*$ ]]; then
+    echo "Error: Quantity must be a positive integer"
+    exit 1
+fi
+
+log_transaction() {
+    echo "[IDTB110209] [SUCCESS] $username bought $quantity widgets" >> "$SALESLOG"
+}
+
+(
+  flock -x 200
+  inventory=$(cat "$INVENTORY")
+  if [ "$quantity" -le "$inventory" ]; then
+      new_inventory=$((inventory - quantity))
+      echo "$new_inventory" > "$INVENTORY"
+      log_transaction
+      echo "Transaction successful!"
+  else
+      echo "Transaction Failed: Not enough inventory!"
+  fi
+) 200> "$LOCKFILE"

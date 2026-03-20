@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Ask user for folder name
+read -p "Enter drop zone folder name: " DIR_NAME
+
+# Validate input
+if [[ -z "$DIR_NAME" ]]; then
+    echo "Error: Folder name cannot be empty."
+    exit 1
+fi
+
+# Define full path
+DROPZONE="$HOME/$DIR_NAME"
+
+# Create directory
+mkdir -p "$DROPZONE"
+
+# Set permissions: allow everyone to write & enter
+chmod o+wx "$DROPZONE"
+
+# Apply sticky bit (important security feature)
+chmod +t "$DROPZONE"
+
+# Optional: allow owner/group full control
+chmod 777 "$DROPZONE"
+
+echo "Secure drop zone created at: $DROPZONE"
+
+# Show permissions
+ls -ld "$DROPZONE"
